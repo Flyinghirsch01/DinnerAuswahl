@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gewürze und Zutaten Auswahl</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .pair-container {
+            margin-bottom: 20px;
+        }
+
+        .pair-container input {
+            margin: 5px;
+        }
+
+        .pair-list {
+            margin-top: 30px;
+        }
+
+        .pair-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pair-list th, .pair-list td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Wähle Gewürze und Zutaten für Paare</h1>
+
+    <!-- Paar 1 -->
+    <div id="pair1" class="pair-container">
+        <h2>Partner 1</h2>
+        <input type="text" id="name1" placeholder="Name des ersten Partners" />
+        <input type="text" id="name2" placeholder="Name des zweiten Partners" />
+        <button id="pair1Button" onclick="startPairSelection(1)">Auswahl starten</button>
+        <div id="pair1-selection" style="display:none;">
+            <p><b>Wähle 3 Gewürze:</b></p>
+            <select id="spices1" multiple size="3"></select>
+            <p><b>Wähle 2 Zutaten:</b></p>
+            <select id="ingredients1" multiple size="2"></select>
+            <button onclick="finishPair(1)">Fertig</button>
+        </div>
+    </div>
+
+    <!-- Paar 2 -->
+    <div id="pair2" class="pair-container" style="display:none;">
+        <h2>Partner 2</h2>
+        <input type="text" id="name3" placeholder="Name des ersten Partners" />
+        <input type="text" id="name4" placeholder="Name des zweiten Partners" />
+        <button id="pair2Button" onclick="startPairSelection(2)">Auswahl starten</button>
+        <div id="pair2-selection" style="display:none;">
+            <p><b>Wähle 3 Gewürze:</b></p>
+            <select id="spices2" multiple size="3"></select>
+            <p><b>Wähle 2 Zutaten:</b></p>
+            <select id="ingredients2" multiple size="2"></select>
+            <button onclick="finishPair(2)">Fertig</button>
+        </div>
+    </div>
+
+    <!-- Paar 3 -->
+    <div id="pair3" class="pair-container" style="display:none;">
+        <h2>Partner 3</h2>
+        <input type="text" id="name5" placeholder="Name des ersten Partners" />
+        <input type="text" id="name6" placeholder="Name des zweiten Partners" />
+        <button id="pair3Button" onclick="startPairSelection(3)">Auswahl starten</button>
+        <div id="pair3-selection" style="display:none;">
+            <p><b>Wähle 3 Gewürze:</b></p>
+            <select id="spices3" multiple size="3"></select>
+            <p><b>Wähle 2 Zutaten:</b></p>
+            <select id="ingredients3" multiple size="2"></select>
+            <button onclick="finishPair(3)">Fertig</button>
+        </div>
+    </div>
+
+    <!-- Paar 4 -->
+    <div id="pair4" class="pair-container" style="display:none;">
+        <h2>Partner 4</h2>
+        <input type="text" id="name7" placeholder="Name des ersten Partners" />
+        <input type="text" id="name8" placeholder="Name des zweiten Partners" />
+        <button id="pair4Button" onclick="startPairSelection(4)">Auswahl starten</button>
+        <div id="pair4-selection" style="display:none;">
+            <p><b>Wähle 3 Gewürze:</b></p>
+            <select id="spices4" multiple size="3"></select>
+            <p><b>Wähle 2 Zutaten:</b></p>
+            <select id="ingredients4" multiple size="2"></select>
+            <button onclick="finishPair(4)">Fertig</button>
+        </div>
+    </div>
+
+    <div class="pair-list">
+        <h2>Ergebnisse</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paar</th>
+                    <th>Gewürze</th>
+                    <th>Zutaten</th>
+                </tr>
+            </thead>
+            <tbody id="resultTable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Liste der verfügbaren Gewürze und Zutaten
+        const spices = ["Estragon", "Rosmarin", "Safran", "Kurkuma", "Basilikum", "Ingwer", "Minze", "Tonka-Bohne", "Vanille", "Sumach", "Thymian", "Zimt"];
+        const ingredients = ["Sojasoße", "Granatapfelkerne", "Kiwi", "Pilze", "Ahornsirup", "Artischocke", "Schwarzer Knoblauch", "Zitrone", "Jalapeños", "Orange", "Avocado", "Parmesan", "Datteln", "Trüffel", "Spinat"];
+
+        let selectedSpices = [];
+        let selectedIngredients = [];
+
+        // Dropdowns mit den Gewürzen und Zutaten füllen
+        function populateSelects(pairId) {
+            const spiceSelect = document.getElementById(`spices${pairId}`);
+            const ingredientSelect = document.getElementById(`ingredients${pairId}`);
+
+            // Gewürz-Optionen hinzufügen
+            spices.forEach(spice => {
+                const option = document.createElement('option');
+                option.value = spice;
+                option.textContent = spice;
+                spiceSelect.appendChild(option);
+            });
+
+            // Zutaten-Optionen hinzufügen
+            ingredients.forEach(ingredient => {
+                const option = document.createElement('option');
+                option.value = ingredient;
+                option.textContent = ingredient;
+                ingredientSelect.appendChild(option);
+            });
+        }
+
+        // Auswahl für das Paar starten
+        function startPairSelection(pairId) {
+            // Sichtbarkeit der Auswahl für das Paar aktivieren
+            document.getElementById(`pair${pairId}-selection`).style.display = 'block';
+            document.getElementById(`pair${pairId}Button`).style.display = 'none';
+
+            // Dropdowns füllen
+            populateSelects(pairId);
+        }
+
+        // Auswahl des Paars abschließen
+        function finishPair(pairId) {
+            const spiceSelect = document.getElementById(`spices${pairId}`);
+            const ingredientSelect = document.getElementById(`ingredients${pairId}`);
+
+            const selectedSpicesForPair = Array.from(spiceSelect.selectedOptions).map(option => option.value);
+            const selectedIngredientsForPair = Array.from(ingredientSelect.selectedOptions).map(option => option.value);
+
+            if (selectedSpicesForPair.length === 3 && selectedIngredientsForPair.length === 2) {
+                // Gewürze und Zutaten zu den bereits ausgewählten hinzufügen
+                selectedSpices.push(...selectedSpicesForPair);
+                selectedIngredients.push(...selectedIngredientsForPair);
+
+                // Ergebnisse der Auswahl anzeigen
+                const pairNames = [
+                    [document.getElementById('name1').value, document.getElementById('name2').value],
+                    [document.getElementById('name3').value, document.getElementById('name4').value],
+                    [document.getElementById('name5').value, document.getElementById('name6').value],
+                    [document.getElementById('name7').value, document.getElementById('name8').value]
+                ];
+
+                const resultTable = document.getElementById('resultTable');
+                const row = resultTable.insertRow();
+                row.insertCell(0).textContent = `${pairNames[pairId-1].join(' und ')}`;
+                row.insertCell(1).textContent = selectedSpicesForPair.join(', ');
+                row.insertCell(2).textContent = selectedIngredientsForPair.join(', ');
+
+                // Für das nächste Paar die Auswahl sichtbar machen
+                if (pairId < 4) {
+                    document.getElementById(`pair${pairId + 1}`).style.display = 'block';
+                }
+            }
+       
