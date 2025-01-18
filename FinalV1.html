@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zufällige Auswahl von Zutaten und Gewürzen</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin-top: 10px; }
+        .result { margin-top: 10px; font-weight: bold; }
+        .team-result { margin-top: 20px; }
+        #nextTeamBtn, #restartBtn { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Zufällige Auswahl von Zutaten und Gewürzen</h1>
+
+    <!-- Anzeige des aktuellen Teams -->
+    <h2>Aktuelles Team: <span id="teamName">Nala und Jan</span></h2>
+
+    <!-- Knöpfe für zufällige Auswahl -->
+    <button id="chooseSpiceBtn">Wähle ein Gewürz</button>
+    <button id="chooseIngredientBtn">Wähle eine Zutat</button>
+
+    <!-- Ergebnisse anzeigen -->
+    <div id="spiceResult" class="result"></div>
+    <div id="ingredientResult" class="result"></div>
+
+    <!-- Anzeige der gezogenen Zutaten und Gewürze für das aktuelle Team -->
+    <div id="teamChosen" class="result"></div>
+
+    <!-- Endergebnisse -->
+    <div id="finalResult" class="result"></div>
+
+    <!-- Button für den Wechsel zum nächsten Team -->
+    <button id="nextTeamBtn">Weiter zum nächsten Team</button>
+
+    <!-- Button für Neustart -->
+    <button id="restartBtn">Neustart</button>
+
+    <script>
+        // Definieren der Gewürze und Zutaten
+        const originalSpices = ["Estragon", "Rosmarin", "Safran", "Kurkuma", "Basilikum", "Ingwer", "Minze", "Tonka-Bohne", "Vanille", "Sumach", "Thymian", "Zimt"];
+        const originalIngredients = ["Sojasoße", "Granatapfelkerne", "Kiwi", "Pilze", "Ahornsirup", "Artischocke", "Schwarzer Knoblauch", "Zitrone", "Jalapeños", "Orange", "Avocado", "Parmesan", "Datteln", "Trüffel", "Spinat"];
+
+        let spices = [...originalSpices];
+        let ingredients = [...originalIngredients];
+
+        const teams = [
+            { name: "Nala und Jan", spicesChosen: [], ingredientsChosen: [] },
+            { name: "Pia und Kevin", spicesChosen: [], ingredientsChosen: [] },
+            { name: "Sophie und Ole", spicesChosen: [], ingredientsChosen: [] },
+            { name: "Leonie und Max", spicesChosen: [], ingredientsChosen: [] }
+        ];
+
+        const maxSpices = 3;
+        const maxIngredients = 2;
+
+        let currentTeamIndex = 0;
+
+        // Funktion zur zufälligen Auswahl eines Elements aus einem Array
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Funktion zur Auswahl eines Gewürzes
+        function chooseSpice() {
+            if (teams[currentTeamIndex].spicesChosen.length >= maxSpices) {
+                document.getElementById('spiceResult').innerText = "Du hast schon alle Gewürze ausgewählt!";
+                return;
+            }
+            const chosenSpice = getRandomItem(spices);
+            teams[currentTeamIndex].spicesChosen.push(chosenSpice);
+            document.getElementById('spiceResult').innerText = `Gewürz ausgewählt: ${chosenSpice}`;
+            const index = spices.indexOf(chosenSpice);
+            if (index > -1) spices.splice(index, 1);
+            checkIfTeamDone();
+        }
+
+        // Funktion zur Auswahl einer Zutat
+        function chooseIngredient() {
+            if (teams[currentTeamIndex].ingredientsChosen.length >= maxIngredients) {
+                document.getElementById('ingredientResult').innerText = "Du hast schon alle Zutaten ausgewählt!";
+                return;
+            }
+            const chosenIngredient = getRandomItem(ingredients);
+            teams[currentTeamIndex].ingredientsChosen.push(chosenIngredient);
+            document.getElementById('ingredientResult').innerText = `Zutat ausgewählt: ${chosenIngredient}`;
+            const index = ingredients.indexOf(chosenIngredient);
+            if (index > -1) ingredients.splice(index, 1);
+            checkIfTeamDone();
+        }
+
+        // Funktion zur Anzeige der Ergebnisse des Teams
+        function showTeamResults() {
+            document.getElementById('teamChosen').innerHTML = `
+                <p><strong>${teams[currentTeamIndex].name} hat folgende Zutaten und Gewürze gewählt:</strong></p>
+                <p><strong>Gewürze:</strong> ${teams[currentTeamIndex].spicesChosen.join(", ")}</p>
+                <p><strong>Zutaten:</strong> ${teams[currentTeamIndex].ingredientsChosen.join(", ")}</p>
+            `;
+        }
+
+        // Funktion zum Zeigen der Endergebnisse
+        function showFinalResults() {
+            let resultHTML = "<h3>Endergebnisse:</h3>";
+            teams.forEach(team => {
+                resultHTML += `<p><strong>${team.name}:</strong><br>Gewürze: ${team.spicesChosen.join(", ")}<br>Zutaten: ${team.ingredientsChosen.join(", ")}</p>`;
+            });
+            resultHTML += `<h3>Nicht gezogene Zutaten und Gewürze:</h3>
+                            <p><strong>Gewürze:</strong> ${spices.join(", ")}</p>
+                            <p><strong>Zutaten:</strong> ${ingredients.join(", ")}</p>`;
+            document.getElementById('finalResult').innerHTML = resultHTML;
+            document.getElementById('nextTeamBtn').style.display = 'none'; // Weiter-Button ausblenden
+            document.getElementById('restartBtn').style.display = 'block'; // Neustart-Button anzeigen
+        }
+
+        // Funktion für den Weiter-Button, um zum nächsten Team zu wechseln
+        function nextTeam() {
+            if (teams[currentTeamIndex].spicesChosen.length >= maxSpices && teams[currentTeamIndex].ingredientsChosen.length >= maxIngredients) {
+                showTeamResults();
+                currentTeamIndex++;
+                if (currentTeamIndex < teams.length) {
+                    document.getElementById('teamName').innerText = teams[currentTeamIndex].name;
+                    document.getElementById('nextTeamBtn').style.display = 'none';
+                    document.getElementById('spiceResult').innerText = document.getElementById('ingredientResult').innerText = '';
+                    document.getElementById('teamChosen').innerHTML = '';
+                } else {
+                    showFinalResults();
+                }
+            }
+        }
+
+        // Funktion zur Überprüfung, ob ein Team alle Auswahlmöglichkeiten getroffen hat
+        function checkIfTeamDone() {
+            if (teams[currentTeamIndex].spicesChosen.length >= maxSpices && teams[currentTeamIndex].ingredientsChosen.length >= maxIngredients) {
+                document.getElementById('nextTeamBtn').style.display = 'block';
+            }
+        }
+
+        // Funktion für den Neustart
+        function restart() {
+            // Zurücksetzen der Daten
+            spices = [...originalSpices];
+            ingredients = [...originalIngredients];
+            teams.forEach(team => {
+                team.spicesChosen = [];
+                team.ingredientsChosen = [];
+            });
+            currentTeamIndex = 0;
+
+            // Alle Anzeigen zurücksetzen
+            document.getElementById('teamName').innerText = teams[currentTeamIndex].name;
+            document.getElementById('spiceResult').innerText = '';
+            document.getElementById('ingredientResult').innerText = '';
+            document.getElementById('teamChosen').innerHTML = '';
+            document.getElementById('finalResult').innerHTML = '';
+
+            // Buttons zurücksetzen
+            document.getElementById('nextTeamBtn').style.display = 'none';
+            document.getElementById('restartBtn').style.display = 'none';
+            document.getElementById('chooseSpiceBtn').disabled = false;
+            document.getElementById('chooseIngredientBtn').disabled = false;
+        }
+
+        // Event Listener für die Buttons
+        document.getElementById('chooseSpiceBtn').addEventListener('click', chooseSpice);
+        document.getElementById('chooseIngredientBtn').addEventListener('click', chooseIngredient);
+        document.getElementById('nextTeamBtn').addEventListener('click', nextTeam);
+        document.getElementById('restartBtn').addEventListener('click', restart);
+
+        // Initialisieren der Anzeige des ersten Teams
+        document.getElementById('teamName').innerText = teams[currentTeamIndex].name;
+    </script>
